@@ -24,6 +24,10 @@ To authenticate your calender:
 * Click the **download** button to the right of the client ID.
 * Move this file to your /src/calender/ directory and rename it client_secret.json.
 
+**Setup Weather**
+* Register at [this](https://darksky.net/dev/register) link
+* You will recieve an API key
+* In */src/weather/* in *weather.cpp*, line 11, change the the API key to the one you recieved like so: https://api.darksky.net/forecast/YOUR_API_KEY_HERE/"
 
-**Other Steps**
-* If you do not live in Atlanta, in *main.cpp* line 27, you will have to update your latitude and longitude to your current location.
+*Optional*
+* If you do not live in Atlanta, in *main.cpp*, line 27, you will have to update your latitude and longitude to your current location.
