@@ -35,5 +35,5 @@ This is will produce an executable magic_mirror which can be run with ./magic_mi
 
 **Voice Recognition**
 * Voice recognition has been setup to parse speech 
-* Requires and external USB Microphone
+* Requires an external USB Microphone
 * Currently does not act upon parsed speech
