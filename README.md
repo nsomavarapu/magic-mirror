@@ -1,6 +1,8 @@
+**Magic Mirror**
+============================================
 A magic mirror system wiritten in C/C++ using GTK+3.
 
-Build Instructions
+**Build Instructions**
 
 This is will build with any *nix system.
 
