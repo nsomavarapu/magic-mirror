@@ -48,9 +48,9 @@ void weather_handler(app_data *wv) {
   }
 }
 
-void calendar_handler() {
-  system("python src/calendar/quickstart.py");
-}
+// void calendar_handler() {
+//   system("python src/calendar/quickstart.py");
+// }
 
 GtkWidget* generate_main_window(GtkApplication *app, const gchar *title, gint w, gint h, gint padding, GdkRGBA *rgba) {
   GtkWidget *window;
@@ -110,7 +110,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
   clock_view = generate_clock_view("40", &rgba_bg, &rgba_fg);
   gtk_grid_attach(GTK_GRID(grid), clock_view, 0, 0, 4, 1);
   clock_handler(gtk_text_view_get_buffer(GTK_TEXT_VIEW(clock_view)));
-  g_timeout_add(60000, (GSourceFunc) clock_handler, gtk_text_view_get_buffer(GTK_TEXT_VIEW(clock_view)));
+  // g_timeout_add(60000, (GSourceFunc) clock_handler, gtk_text_view_get_buffer(GTK_TEXT_VIEW(clock_view)));
 
   for (int i = 0; i < 4; i++) {
     weather_images[i] = gtk_image_new_from_file("");
@@ -132,8 +132,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
   calendar = gtk_calendar_new ();
   gtk_grid_attach(GTK_GRID(grid), calendar, 0, 4, 4, 1);
-  calendar_handler();
-  g_timeout_add(5000, (GSourceFunc) calendar_handler, NULL);
+  // calendar_handler();
+  // g_timeout_add(5000, (GSourceFunc) calendar_handler, NULL);
   
   const gchar *events_strings[numEvents];
 

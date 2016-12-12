@@ -1,7 +1,6 @@
 from __future__ import print_function
 import httplib2
 import os
-import sys
 
 from apiclient import discovery
 from oauth2client import client
@@ -24,8 +23,6 @@ APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 
 def get_credentials():
-    
-
     """Gets valid user credentials from storage.
 
     If nothing has been stored, or if the stored credentials are invalid,
@@ -57,10 +54,8 @@ def main():
     target = open(".events", 'w')
     today = datetime.datetime.now() + datetime.timedelta(days=1)
     todayStr = str(today)[0:10] + "T00:00:00-05:00"
-    print(todayStr)
     yesterday = datetime.datetime.now() + datetime.timedelta(days=0)
     yesterdayStr = str(yesterday)[0:10] + "T00:00:00-05:00"
-    print(yesterdayStr)
     """Shows basic usage of the Google Calendar API.
 
     Creates a Google Calendar API service object and outputs a list of the next
@@ -71,25 +66,26 @@ def main():
     service = discovery.build('calendar', 'v3', http=http)
 
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    print('Getting the upcoming 10 events')
     eventsResult = service.events().list(
         calendarId='primary', timeMin=yesterdayStr, maxResults=10, timeMax=todayStr, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
+    cnt = 0
     if not events:
         target.write('No upcoming events found.')
-    else:
-        for event in range(len(events) - 1 ):
-            start = event['start'].get('dateTime', event['start'].get('date'))
-            print(start)
-            target.write(start[11:16])
-            target.write(' ')
-            target.write(event['summary'])
-            target.write('\n')
+    for event in events:
+        start = event['start'].get('dateTime', event['start'].get('date'))
+        print(start, event['summary'])
         target.write(start[11:16])
         target.write(' ')
         target.write(event['summary'])
+        if cnt != len(events-1):
+            target.write('\n')
+        cnt += 1
 
+        
 
 
 if __name__ == '__main__':
