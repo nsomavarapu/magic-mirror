@@ -31,3 +31,9 @@ This is will produce an executable magic_mirror which can be run with ./magic_mi
 
 *Optional*
 * If you do not live in Atlanta, in *main.cpp*, line 27, you will have to update your latitude and longitude to your current location, respectively.
+
+
+**Voice Recognition**
+* Voice recognition has been setup to parse speech 
+* Requires and external USB Microphone
+* Currently does not act upon parsed speech
