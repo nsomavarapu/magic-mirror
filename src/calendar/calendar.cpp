@@ -1,12 +1,35 @@
 #include "calendar.h"
 
-void populate_event_strings(const char **event_strings, int numEvents) {
-	const char *e_strs[3];
-	e_strs[0] = "Meeting with Professor Hamblen 11:30am";
-  	e_strs[1] = "Dinner with Johnny 6:00pm";
-  	e_strs[2] = "Party at Will's house 10:00pm";
+int get_num_events() {
+  int numEvents = 0;
 
-	for(int i = 0; i < numEvents; i++) {
-		event_strings[i] = e_strs[i];
-	}
+  ifstream in(".events");
+  std::string line;
+
+  if(in.is_open()) {
+    while(getline(in, line)) {
+      numEvents++;
+    }
+  }
+  return numEvents;
+}
+void populate_event_strings(const gchar **event_strings, int numEvents) {
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen(".events", "r");
+    if (fp != NULL) {
+      for(int i = 0; i < numEvents; i++) {
+        read = getline(&line, &len, fp);
+        char *pos;
+        if((pos = strchr(line, '\n')) != NULL)
+        	*pos = '\0';
+        event_strings[i] = g_locale_to_utf8(line, -1, NULL, NULL, NULL);
+      }
+    }
+    fclose(fp);
+    if (line)
+        free(line);
 }

@@ -23,7 +23,7 @@ void clock_handler(GtkTextBuffer *text) {
   g_date_time_unref(now);
 }
 
-void weather_handler(weather_view *wv) {
+void weather_handler(app_data *wv) {
   json weatherData = getWeather(33.7756, -84.3963);
 
   for(int i = 0; i < 4; i++) {
@@ -43,15 +43,13 @@ void weather_handler(weather_view *wv) {
     string temp = tempStringRaw.substr(1, tempStringRaw.length() - 2);
 
     gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(wv->w_titles[i])), time.c_str(), -1);
-    // printf(time.c_str(), "%s");
-    // printf("\n");
     gtk_image_set_from_file(GTK_IMAGE(wv->w_images[i]), path.c_str());
-    // printf(path.c_str(), "%s");
-    // printf("\n");
     gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(wv->w_temps[i])), temp.c_str(), -1);
-    // printf(temp.c_str(), "%s");
-    // printf("\n");
   }
+}
+
+void calendar_handler() {
+  system("python src/calendar/quickstart.py");
 }
 
 GtkWidget* generate_main_window(GtkApplication *app, const gchar *title, gint w, gint h, gint padding, GdkRGBA *rgba) {
@@ -76,23 +74,32 @@ GtkWidget* generate_clock_view(const char *font_descriptor, GdkRGBA *rgba_bg, Gd
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
+  int numEvents = get_num_events();
+  
   GtkWidget  *window;
   GtkWidget  *grid;
   GtkWidget  *clock_view;
   GdkRGBA    rgba_bg, rgba_fg;
-  GdkRGBA    color_pallette[3];
+  GdkRGBA    color_pallette[10];
   GtkWidget  *calendar;
-  GtkWidget  *events[3];
-  const char *events_strings[3];
+  GtkWidget  *events[numEvents];
+  
   GtkWidget  *weather_images[4];
   GtkWidget  *weather_titles[4];
-  GtkWidget *weather_temps[4];
+  GtkWidget  *weather_temps[4];
 
   gdk_rgba_parse(&rgba_bg, "black");
   gdk_rgba_parse(&rgba_fg, "white");
   gdk_rgba_parse(&color_pallette[0], "#F49AC2");
   gdk_rgba_parse(&color_pallette[1], "#CB99C9");
   gdk_rgba_parse(&color_pallette[2], "#77DD77");
+  gdk_rgba_parse(&color_pallette[3], "#FFB347");
+  gdk_rgba_parse(&color_pallette[4], "#779ECB");
+  gdk_rgba_parse(&color_pallette[5], "#C23B22");
+  gdk_rgba_parse(&color_pallette[6], "#AEC6CF");
+  gdk_rgba_parse(&color_pallette[7], "#03C03C");
+  gdk_rgba_parse(&color_pallette[8], "#966FD6");
+  gdk_rgba_parse(&color_pallette[8], "#DEA5A4");
 
   window = generate_main_window(app, "Magic Mirror", 1390, 768, 10, &rgba_bg);
 
@@ -116,27 +123,30 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_grid_attach(GTK_GRID(grid), weather_images[i], i, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), weather_temps[i], i, 3, 1, 1);
 
-    ((weather_view *)user_data)->w_images[i] = weather_images[i];
-    ((weather_view *)user_data)->w_titles[i] = weather_titles[i];
-    ((weather_view *)user_data)->w_temps[i] = weather_temps[i];
+    ((app_data *)user_data)->w_images[i] = weather_images[i];
+    ((app_data *)user_data)->w_titles[i] = weather_titles[i];
+    ((app_data *)user_data)->w_temps[i] = weather_temps[i];
   }
-  weather_handler((weather_view *) user_data);
-  g_timeout_add(900000, (GSourceFunc) weather_handler, (weather_view *) user_data);
+  weather_handler((app_data *) user_data);
+  g_timeout_add(900000, (GSourceFunc) weather_handler, (app_data *) user_data);
 
   calendar = gtk_calendar_new ();
   gtk_grid_attach(GTK_GRID(grid), calendar, 0, 4, 4, 1);
+  calendar_handler();
+  g_timeout_add(5000, (GSourceFunc) calendar_handler, NULL);
+  
+  const gchar *events_strings[numEvents];
 
-  populate_event_strings(events_strings, 3);
-  for (int i = 0; i < 3; i++) {
+  populate_event_strings(events_strings, numEvents);
+  
+  for (int i = 0; i < numEvents; i++) {
     events[i] = gtk_text_view_new();
     set_textview_styling(events[i], "10", &color_pallette[i], &rgba_fg);
     gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(events[i])), events_strings[i], -1);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(events[i]), 10);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(events[i]), 10);
+    gtk_grid_attach(GTK_GRID(grid), events[i], 0, (5+i), 4, 1);
   }
-  gtk_grid_attach(GTK_GRID(grid), events[0], 0, 5, 4, 1);
-  gtk_grid_attach(GTK_GRID(grid), events[1], 0, 6, 4, 1);
-  gtk_grid_attach(GTK_GRID(grid), events[2], 0, 7, 4, 1);
 
   gtk_widget_show_all(window);
 }
@@ -144,8 +154,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
 int main (int argc, char *argv[]) {
   GtkApplication *app;
   int status;
-  
-  weather_view *wv = (weather_view *) malloc(sizeof(weather_view));
+
+  app_data *wv = (app_data *) malloc(sizeof(app_data));
   app = gtk_application_new ("org.gtk.mm", G_APPLICATION_FLAGS_NONE);
   g_signal_connect (app, "activate", G_CALLBACK (activate), wv);
   status = g_application_run (G_APPLICATION (app), argc, argv);
